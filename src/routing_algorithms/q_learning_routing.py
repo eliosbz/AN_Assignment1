@@ -15,29 +15,30 @@ class QLearningRouting(BASE_routing):
     def __init__(self, drone, simulator):
         BASE_routing.__init__(self, drone=drone, simulator=simulator)
         self.taken_actions = {}  # id event : (old_state, old_action)
-        self.q_table:  Dict[int, List[int]] = {}
+        self.q_table: Dict[int, List[int]] = {}
         for i in range(self.NUMBER_OF_CELL):
             self.q_table[i] = [0 for i in range(self.NUMBER_OF_ACTIONS)]
         self.random_gen = np.random.RandomState(self.simulator.seed)
-        
 
     # def compute_quality():
-    #    1/cur_step 
+    #    1/cur_step
 
-    def TD(self, reward, state, action, list_action, Q_old):
+    def TD(self, reward, list_action, Q_old):
         return reward + self.GAMMA * max(list_action) - Q_old
 
     def compute_reward(self, delay, outcome, drone):
-        #self.selection_count += 1 # to compute the UBC we need to keep the count of the times this action is selected and thus a reward is received
+        # self.selection_count += 1 # to compute the UBC we need to keep the count of the times this action is selected and thus a reward is received
 
         # This is a more complex reward that reflects the goodness of the feedback
         if outcome == 1:
             # a packet is received with some delay
-            reward = 4 * drone.buffer_length() / delay # try to exploit also the number of packet a drone has in buffer
+            reward = (
+                4 * drone.buffer_length() / delay
+            )  # try to exploit also the number of packet a drone has in buffer
         elif outcome == -1:
             reward = -2
 
-        #self.total_rewards += reward # to compute the UBC we need to sum the reward
+        # self.total_rewards += reward # to compute the UBC we need to sum the reward
         return reward
 
     def feedback(self, drone, id_event, delay, outcome):
@@ -63,14 +64,12 @@ class QLearningRouting(BASE_routing):
             # TIPS: implement here the q-table updating process
 
             # Drone id and Taken actions
-            #print(f"\nIdentifier: {self.drone.identifier}, Taken Actions: {self.taken_actions}, Time Step: {self.simulator.cur_step}")
+            print(
+                f"\nIdentifier: {self.drone.identifier}, Taken Actions: {self.taken_actions}, Time Step: {self.simulator.cur_step}"
+            )
 
             # feedback from the environment
-            #print(drone, id_event, delay, outcome)
-
-            #print(drone.depot.coords)
-            #print(drone.coords)
-            #print(drone.next_target())
+            # print(drone, id_event, delay, outcome)
 
             # TODO: write your code here
 
@@ -82,11 +81,24 @@ class QLearningRouting(BASE_routing):
             # reward or update using the old state and the selected action at that time
             # do something or train the model (?)
             reward = self.compute_reward(delay, outcome, drone)
-            #print(f"Q-Table: {self.q_table}")
-            #self.q_table[state][action] += self.ALPHA * self.TD(reward, state, action, self.q_table[int(util.euclidean_distance(drone.next_target(), self.drone.depot.coords))], self.q_table[state][action])
-            self.q_table[state][action] += self.ALPHA * self.TD(reward, state, action, self.q_table[int(self.NUMBER_OF_CELL*util.euclidean_distance(drone.next_target(), self.drone.depot.coords)/util.euclidean_distance(self.drone.depot.coords, (0,util.config.ENV_HEIGHT)))], self.q_table[state][action])
+            # print(f"Q-Table: {self.q_table}")
+            self.q_table[state][action] += self.ALPHA * self.TD(
+                reward,
+                self.q_table[
+                    int(
+                        self.NUMBER_OF_CELL
+                        * util.euclidean_distance(
+                            drone.next_target(), self.drone.depot.coords
+                        )
+                        / util.euclidean_distance(
+                            self.drone.depot.coords, (0, util.config.ENV_HEIGHT)
+                        )
+                    )
+                ],
+                self.q_table[state][action],
+            )
         # retrieve feedback
-        #return drone, id_event, delay, outcome, state, action
+        # return drone, id_event, delay, outcome, state, action
 
     def relay_selection(self, opt_neighbors: list, packet):
         """
@@ -99,7 +111,7 @@ class QLearningRouting(BASE_routing):
         # TODO: Implement your code HERE
 
         # A Drone can take 2 actions: send or keep the packet
-        # The state is the distance between the drone and the depot 
+        # The state is the distance between the drone and the depot
         # TODO: try to use also the speed of the drone as an information of the state
 
         # Only if you need!
@@ -108,64 +120,60 @@ class QLearningRouting(BASE_routing):
         #                                                x_pos=self.drone.coords[0],  # e.g. 1500
         #                                                y_pos=self.drone.coords[1])[0]  # e.g. 500
         # print(cell_index)
-        
-        cell_index = int(self.NUMBER_OF_CELL*
-                util.euclidean_distance(self.drone.coords, self.drone.depot.coords)
-                /util.euclidean_distance(self.drone.depot.coords, (0, util.config.ENV_HEIGHT)))
-        #print(cell_index)
 
         state, action = None, None
-        #print("self.drone: ", self.drone)
-        
-        state = cell_index #distance = int(util.euclidean_distance(self.drone.coords, self.drone.depot.coords))
-        #if distance not in self.q_table:
-        #    self.q_table[distance] = [0 for i in range(0,2)]
 
-        #print("opt_neighbors: ", opt_neighbors)
+        state = cell_index = int(
+            self.NUMBER_OF_CELL
+            * util.euclidean_distance(self.drone.coords, self.drone.depot.coords)
+            / util.euclidean_distance(
+                self.drone.depot.coords, (0, util.config.ENV_HEIGHT)
+            )
+        )
+
         neighbors_drones = {neighbor for hello_pkt, neighbor in opt_neighbors}
-        #print("neighbors_drones: ", neighbors_drones)
 
         # balance exploration and exploitation
         if self.random_gen.uniform(0, 1) < self.EPSILON:
-            print("explore")
+            #print("explore")
             # explore
-            #if not self.drone in neighbors_drones:
-            #neighbors_drones.add(self.drone)
+            # neighbors_drones.add(self.drone) # TODO: try with or without the self drone in neighbors_drones
             action = 0 if self.random_gen.uniform(0, 1) < 0.5 else 1
-            # TODO: try with or without the self drone in neighbors_drones
-            relay = self.drone if (action == 0) else self.simulator.rnd_routing.choice(list(neighbors_drones))
+            
+            relay = (
+                self.drone
+                if (action == 0)
+                else self.simulator.rnd_routing.choice(list(neighbors_drones))
+            )
         else:
             # exploit
             if self.q_table[state][0] == self.q_table[state][1]:
                 action = 0 if self.random_gen.uniform(0, 1) < 0.5 else 1
             else:
                 action = self.q_table[state].index(max(self.q_table[state]))
-            if (action == 0):
-                relay = self.drone 
-                print("exploit - keep")
+            
+            if action == 0:
+                relay = self.drone
+                #print("exploit - keep")
             else:
-                print("exploit - send")
+                #print("exploit - send")
                 min_distance = 100000
                 relay = self.drone
                 for drone in neighbors_drones:
-                    distance = int(self.NUMBER_OF_CELL*util.euclidean_distance(drone.next_target(), self.drone.depot.coords)/util.euclidean_distance(self.drone.depot.coords, (0,util.config.ENV_HEIGHT)))
+                    distance = int(
+                        self.NUMBER_OF_CELL
+                        * util.euclidean_distance(
+                            drone.next_target(), self.drone.depot.coords
+                        )
+                        / util.euclidean_distance(
+                            self.drone.depot.coords, (0, util.config.ENV_HEIGHT)
+                        )
+                    )
                     if min(min_distance, distance) < min_distance:
                         min_distance = distance
                         relay = drone
 
-
-
-        #next_distance = int(util.euclidean_distance(self.drone.next_target(), self.drone.depot.coords))
-        
-        #print(opt_neighbors)
-
-        #print(self.drone.identifier)
-
         # Store your current action --- you can add some stuff if needed to take a reward later
         self.taken_actions[packet.event_ref.identifier] = (state, action)
 
-        #if next_distance not in self.q_table:
-        #    self.q_table[next_distance] = [0 for i in range(0,2)]
-
-        #print("relay: ", relay)
         return relay  # here you should return a drone object!
