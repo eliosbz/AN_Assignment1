@@ -14,6 +14,9 @@ TITLE_SIZE = 26
 TICKS_SIZE = 20
 OTHER_SIZES = 20
 
+ALGOS = ["QL", "RND", "GEO"]
+NUM_DRONES = [5, 10, 15, 20, 25, 30]
+
 METRICS_OF_INTEREST = [
     "number_of_packets_to_depot",
     "packet_mean_delivery_time",
@@ -35,33 +38,61 @@ SCALE_LIM_DICT = {
 }
 
 PLOT_DICT = {
-    "algo_1": {
+    "QL": {
         "hatch": "",
         "markers": "X",
         "linestyle": "-",
         "color": plt.cm.tab10(0),
-        "label": "Algo 1",
-        "x_ticks_positions": np.array(np.linspace(0, 8, 5))
+        "label": "QL",
+        "x_ticks_positions": np.array(NUM_DRONES)
     },
-    "algo_2": {
+    "RND": {
         "hatch": "",
         "markers": "p",
         "linestyle": "-",
         "color": plt.cm.tab10(1),
-        "label": "Algo 2",
-        "x_ticks_positions": np.array(np.linspace(0, 8, 5))
+        "label": "RND",
+        "x_ticks_positions": np.array(NUM_DRONES)
 
     },
-    "algo_n": {
+    "GEO": {
         "hatch": "",
         "markers": "s",
         "linestyle": "-",
         "color": plt.cm.tab10(8),
-        "label": "Algo n",
-        "x_ticks_positions": np.array(np.linspace(0, 8, 5))
+        "label": "GEO",
+        "x_ticks_positions": np.array(NUM_DRONES)
 
     }
 }
+# PLOT_DICT = {
+#     "algo_1": {
+#         "hatch": "",
+#         "markers": "X",
+#         "linestyle": "-",
+#         "color": plt.cm.tab10(0),
+#         "label": "Algo 1",
+#         "x_ticks_positions": np.array(np.linspace(0, 8, 5))
+#     },
+#     "algo_2": {
+#         "hatch": "",
+#         "markers": "p",
+#         "linestyle": "-",
+#         "color": plt.cm.tab10(1),
+#         "label": "Algo 2",
+#         "x_ticks_positions": np.array(np.linspace(0, 8, 5))
+
+#     },
+#     "algo_n": {
+#         "hatch": "",
+#         "markers": "s",
+#         "linestyle": "-",
+#         "color": plt.cm.tab10(8),
+#         "label": "Algo n",
+#         "x_ticks_positions": np.array(np.linspace(0, 8, 5))
+
+#     }
+# }
 
 # *** EXAMPLE ***
 

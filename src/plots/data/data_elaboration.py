@@ -13,7 +13,10 @@ To aggregate data you can use also external libraries such as Pandas!
 
 IMPORTANT: Both averages and stds must be computed over different seeds for the same metric!
 """
-
+import numpy as np
+import os
+import json
+from src.plots.config import ALGOS, NUM_DRONES, METRICS_OF_INTEREST
 
 def compute_data_avg_std(path: str):
     """
@@ -23,15 +26,33 @@ def compute_data_avg_std(path: str):
     """
 
     # TODO: Implement your code HERE
-
-    pass
+    results = {}
+    for algo in ALGOS:
+        print("Processing algorithm: ", algo)
+        results[algo] = {}
+        for metric in METRICS_OF_INTEREST:
+            results[algo][metric] = {}
+            print("Processing metric: ", metric)
+            results[algo][metric]["num_drones"] = {}
+            for nd in NUM_DRONES:
+                results[algo][metric]["num_drones"][nd] = {}
+                print("Processing nd: ", nd)
+                data = []
+                for file in os.listdir(path):
+                    if file.endswith(".json") and file.split(".")[1] == algo and file.split("_")[3] == str(nd):
+                            with open(os.path.join(path, file), 'r') as f:
+                                js = json.load(f)
+                                data.append(js[metric])
+                results[algo][metric]["num_drones"][nd]["mean"] = np.mean(data)
+                results[algo][metric]["num_drones"][nd]["std"] = np.std(data)
+    #print(results)
+    return results
 
 
 if __name__ == "__main__":
     """
     You can run this file to test your script
     """
-
     path = "data/evaluation_tests"
 
     compute_data_avg_std(path=path)

@@ -31,10 +31,11 @@ The script plot_data.py can be run using python -m src.plots.plot_data
 import matplotlib.pyplot as plt
 import numpy as np
 from src.experiments.json_and_plot import ALL_SIZE
-from src.plots.config import PLOT_DICT, LABEL_SIZE, LEGEND_SIZE
+from src.plots.config import ALGOS, METRICS_OF_INTEREST, PLOT_DICT, LABEL_SIZE, LEGEND_SIZE
+from src.plots.data.data_elaboration import compute_data_avg_std
 
 
-def plot(algorithm: list,
+def plot(algorithms: list,
          y_data: list,
          y_data_std: list,
          type: str):
@@ -49,20 +50,23 @@ def plot(algorithm: list,
 
     fig, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8.5, 6.5))
 
-    print(f"Algorithm: {algorithm}")
+    print(f"Algorithm: {algorithms}")
 
     print(f"y_data: {y_data}\ny_data_std: {y_data_std}")
 
-    ax1.errorbar(x=np.array(PLOT_DICT[algorithm]["x_ticks_positions"]),
-                 y=y_data,
-                 yerr=y_data_std,
-                 label=PLOT_DICT[algorithm]["label"],
-                 marker=PLOT_DICT[algorithm]["markers"],
-                 linestyle=PLOT_DICT[algorithm]["linestyle"],
-                 color=PLOT_DICT[algorithm]["color"],
-                 markersize=8)
+    for algorithm, y_d, y_d_s in zip(algorithms, y_data, y_data_std):
+        print(f"Algorithm: {algorithm}")
+        print(f"y_d: {y_d}\ny_d_s: {y_d_s}")
+        ax1.errorbar(x=np.array(PLOT_DICT[algorithm]["x_ticks_positions"]),
+                    y=y_d,
+                    yerr=y_d_s,
+                    label=PLOT_DICT[algorithm]["label"],
+                    marker=PLOT_DICT[algorithm]["markers"],
+                    linestyle=PLOT_DICT[algorithm]["linestyle"],
+                    color=PLOT_DICT[algorithm]["color"],
+                    markersize=8)
 
-    ax1.set_ylabel(ylabel="Metric 1", fontsize=LABEL_SIZE)
+    ax1.set_ylabel(ylabel=str(type), fontsize=LABEL_SIZE)
     ax1.set_xlabel(xlabel="UAVs", fontsize=LABEL_SIZE)
     ax1.tick_params(axis='both', which='major', labelsize=ALL_SIZE)
 
@@ -95,12 +99,27 @@ if __name__ == "__main__":
     # you can call the compute_data_avg_std in data_elaboration function here to get all the data you need
     # in this example that function is "approximated" using np.linspace()
 
-    algorithm = "algo_1"
-    y_data = np.linspace(0, 10, 5)
-    y_data_std = np.linspace(0, 1, 5)
-    type = "metric_1"
+    path = "data/evaluation_tests"
 
-    plot(algorithm=algorithm, y_data=y_data, y_data_std=y_data_std, type=type)
+    data = compute_data_avg_std(path=path)
+
+    y_data, y_data_std =[], []
+    for metric in METRICS_OF_INTEREST:
+        metric_data, metric_data_std = [], []
+        for algorithm in ALGOS:
+            algo_data, algo_std = [], []
+            for nd in np.array(PLOT_DICT[algorithm]["x_ticks_positions"]):
+                algo_data.append(data[algorithm][metric]["num_drones"][nd]["mean"])
+                algo_std.append(data[algorithm][metric]["num_drones"][nd]["std"])
+            metric_data.append(algo_data)
+            metric_data_std.append(algo_std)
+        y_data.append(metric_data)
+        y_data_std.append(metric_data_std)
+
+    print(f"y_data: {y_data}\ny_data_std: {y_data_std}")
+
+    for i, metric in enumerate(METRICS_OF_INTEREST):
+        plot(algorithms=ALGOS, y_data=y_data[i], y_data_std=y_data_std[i], type=metric)
 
     # ***EXAMPLE***
 
