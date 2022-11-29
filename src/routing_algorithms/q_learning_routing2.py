@@ -51,10 +51,11 @@ class QLearningRouting2(BASE_routing):
 
             #compute reward - DA MIGLIORARE
             reward = outcome
-            next_state = util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
-                                                           width_area=self.simulator.env_width,
-                                                           x_pos=self.drone.next_target()[0],
-                                                           y_pos=self.drone.next_target()[1])[0]
+            next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.simulator.prob_size_cell,
+                                                               width_area=self.simulator.env_width,
+                                                               x_pos=self.drone.next_target()[0],
+                                                               y_pos=self.drone.next_target()[1])[0])
+
             self.q_table[state, action] += self.alpha * (reward + (self.gamma * self.q_table[next_state].max()) - self.q_table[state, action])
 
             # remove the entry, the action has received the feedback
