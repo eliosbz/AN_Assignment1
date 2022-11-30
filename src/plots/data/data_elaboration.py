@@ -45,6 +45,7 @@ def compute_data_avg_std(path: str):
                                 data.append(js[metric])
                 results[algo][metric]["num_drones"][nd]["mean"] = np.mean(data)
                 results[algo][metric]["num_drones"][nd]["std"] = np.std(data)
+                #print(results)
     #print(results)
     return results
 

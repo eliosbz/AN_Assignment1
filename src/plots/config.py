@@ -14,7 +14,7 @@ TITLE_SIZE = 26
 TICKS_SIZE = 20
 OTHER_SIZES = 20
 
-ALGOS = ["QL", "RND", "GEO"]
+ALGOS = ["QL", "RND", "GEO", "QL_ALPHA03"]
 NUM_DRONES = [5, 10, 15, 20, 25, 30]
 
 METRICS_OF_INTEREST = [
@@ -62,7 +62,14 @@ PLOT_DICT = {
         "color": plt.cm.tab10(8),
         "label": "GEO",
         "x_ticks_positions": np.array(NUM_DRONES)
-
+    },
+    "QL_ALPHA03": {
+        "hatch": "",
+        "markers": "X",
+        "linestyle": "-",
+        "color": plt.cm.tab10(2),
+        "label": "QL_ALPHA",
+        "x_ticks_positions": np.array(NUM_DRONES)
     }
 }
 # PLOT_DICT = {

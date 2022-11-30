@@ -23,17 +23,18 @@ class GeoRouting(BASE_routing):
             OPTIONAL: design and implement your own heuristic (you can consider all the info in the hello packets)
         """
 
-        GREEDY_HEURISTIC = "MFP"
+        GREEDY_HEURISTIC = "MYC2S" #"MFP"
 
-        assert GREEDY_HEURISTIC in ["NFP", "MFP", "CR"]
+        assert GREEDY_HEURISTIC in ["NFP", "MFP", "CR", "MYC2S"]
 
         relay = None
         depot_pos = self.drone.depot.coords
-        drone_pos = self.drone.next_target()  # STEP 2 |self.drone.coords # STEP 1 |
+        drone_pos = self.drone.coords #self.drone.next_target()  # STEP 2 |self.drone.coords # STEP 1 |
 
         min_FP = self.drone.communication_range
         max_FP = 0
         min_CR = 90
+        min_distance = 100000
 
         for hello_pkt, neighbor in opt_neighbors:
 
@@ -61,6 +62,15 @@ class GeoRouting(BASE_routing):
                 if angle < min_CR:
 
                     min_CR = angle
+                    relay = neighbor
+
+            elif GREEDY_HEURISTIC == "MYC2S":
+                distance = util.euclidean_distance(
+                            neighbor_pos, #neighbor_pos, neighbor.next_target(), neighbor.coords, hello_pkt.next_target,
+                            depot_pos
+                        )
+                if min(min_distance, distance) < min_distance:
+                    min_distance = distance
                     relay = neighbor
 
         return relay

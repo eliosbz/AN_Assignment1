@@ -2,6 +2,8 @@
 from src.routing_algorithms.georouting import GeoRouting
 from src.routing_algorithms.q_learning_routing import QLearningRouting
 from src.routing_algorithms.q_learning_routing2 import QLearningRouting2
+from src.routing_algorithms.q_learning_routing_alpha import QLearningRouting_Alpha
+from src.routing_algorithms.q_learning_routing_depsilon import QLearningRouting_DEpsilon
 from src.routing_algorithms.random_routing import RandomRouting
 from enum import Enum
 
@@ -58,7 +60,7 @@ SIM_DURATION = 15000   # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 20         # int: seed of this simulation.
 
-N_DRONES = 5      # int: number of drones. # ***
+N_DRONES = 30      # int: number of drones. # ***
 ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 
@@ -87,6 +89,8 @@ class RoutingAlgorithm(Enum):
     RND = RandomRouting
     QL = QLearningRouting
     QL2 = QLearningRouting2
+    QL_ALPHA03 = QLearningRouting_Alpha
+    QL_DE = QLearningRouting_DEpsilon
 
     @staticmethod
     def keylist():
@@ -102,7 +106,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.QL2
+ROUTING_ALGORITHM = RoutingAlgorithm.QL_DE
 CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.
