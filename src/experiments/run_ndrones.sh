@@ -8,9 +8,9 @@
 
 
 #test others algorithms
-for nd in "5" "10" "15" "20" "25" "30";
+for nd in "5" "10" "15" "20" "25" "30" "35" "40";
 do
-    for alg in QL_ALPHA03 #"GEO" "RND" "QL";
+    for alg in "QL", "RND", "GEO", "QL_DE", "QL2", "QL3";
     do
         echo "run: ${alg} - ndrones ${nd} "
         python -m src.experiments.experiment_ndrones -nd ${nd} -i_s 0 -e_s 10 -alg ${alg} &

@@ -14,8 +14,8 @@ TITLE_SIZE = 26
 TICKS_SIZE = 20
 OTHER_SIZES = 20
 
-ALGOS = ["QL", "RND", "GEO", "QL_ALPHA03"]
-NUM_DRONES = [5, 10, 15, 20, 25, 30]
+ALGOS = ["QL", "RND", "GEO", "QL_DE", "QL2", "QL3"]
+NUM_DRONES = [5, 10, 15, 20, 25, 30, 35, 40]
 
 METRICS_OF_INTEREST = [
     "number_of_packets_to_depot",
@@ -63,14 +63,31 @@ PLOT_DICT = {
         "label": "GEO",
         "x_ticks_positions": np.array(NUM_DRONES)
     },
-    "QL_ALPHA03": {
+    "QL_DE": {
         "hatch": "",
-        "markers": "X",
+        "markers": "*",
         "linestyle": "-",
         "color": plt.cm.tab10(2),
         "label": "QL_ALPHA",
         "x_ticks_positions": np.array(NUM_DRONES)
+    },
+    "QL2": {
+        "hatch": "",
+        "markers": "^",
+        "linestyle": "-",
+        "color": plt.cm.tab10(9),
+        "label": "QL_ALPHA",
+        "x_ticks_positions": np.array(NUM_DRONES)
+    },
+    "QL3": {
+        "hatch": "",
+        "markers": "D",
+        "linestyle": "-",
+        "color": plt.cm.tab10(3),
+        "label": "QL_ALPHA",
+        "x_ticks_positions": np.array(NUM_DRONES)
     }
+
 }
 # PLOT_DICT = {
 #     "algo_1": {

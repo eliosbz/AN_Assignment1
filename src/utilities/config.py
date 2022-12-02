@@ -3,7 +3,6 @@ from src.routing_algorithms.georouting import GeoRouting
 from src.routing_algorithms.q_learning_routing import QLearningRouting
 from src.routing_algorithms.q_learning_routing2 import QLearningRouting2
 from src.routing_algorithms.q_learning_routing3 import QLearningRouting3
-from src.routing_algorithms.q_learning_routing_alpha import QLearningRouting_Alpha
 from src.routing_algorithms.q_learning_routing_depsilon import QLearningRouting_DEpsilon
 from src.routing_algorithms.random_routing import RandomRouting
 from enum import Enum
@@ -91,7 +90,6 @@ class RoutingAlgorithm(Enum):
     QL = QLearningRouting
     QL2 = QLearningRouting2
     QL3 = QLearningRouting3
-    QL_ALPHA03 = QLearningRouting_Alpha
     QL_DE = QLearningRouting_DEpsilon
 
     @staticmethod
@@ -108,7 +106,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.QL3
+ROUTING_ALGORITHM = RoutingAlgorithm.QL
 CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.
