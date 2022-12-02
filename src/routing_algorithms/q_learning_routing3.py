@@ -3,9 +3,9 @@ import numpy as np
 from numpy.random import Generator, PCG64
 from src.routing_algorithms.BASE_routing import BASE_routing
 from src.utilities import utilities as util
-from typing import List
+from typing import List, Dict
 
-class QLearningRouting2(BASE_routing):
+class QLearningRouting3(BASE_routing):
 
     def __init__(self, drone, simulator):
         BASE_routing.__init__(self, drone=drone, simulator=simulator)
@@ -18,12 +18,12 @@ class QLearningRouting2(BASE_routing):
         self.gamma = 0.2
         self.actions_number = 2
         self.q_table = np.zeros((self.cells_number, self.actions_number), dtype=float)
-        self.taken_actions = {}  # id event : (old_state, old_action)
+        self.taken_actions: Dict[int : List[(int, int, int)]] = {}  # id event : (old_state, old_action)
         self.random_gen = np.random.RandomState(self.simulator.seed)
 
     def compute_reward(self, outcome, delay, drone):
         if outcome == 1:
-            return 2*drone.buffer_length() / delay
+            return 2 * drone.buffer_length() / delay
         else:
             return -2
         
@@ -57,18 +57,21 @@ class QLearningRouting2(BASE_routing):
 
             # TODO: write your code here
 
-            state, action = self.taken_actions[id_event]
+            #history = set(self.taken_actions[id_event])
+            history = self.taken_actions[id_event]
+            #print(history)
 
             #compute reward - DA MIGLIORARE
             reward = self.compute_reward(outcome, delay, drone)
             #reward = outcome
-            print(self.q_table)
-            next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.size_cell,
-                                                               width_area=self.simulator.env_width,
-                                                               x_pos=self.drone.next_target()[0],
-                                                               y_pos=self.drone.next_target()[1])[0])
+            #next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.size_cell,
+            #                                                   width_area=self.simulator.env_width,
+            #                                                   x_pos=self.drone.next_target()[0],
+            #                                                   y_pos=self.drone.next_target()[1])[0])
 
-            self.q_table[state, action] += self.alpha * (reward + self.gamma * self.q_table[next_state].max() - self.q_table[state, action])
+            print(self.q_table)
+            for h in history:
+                self.q_table[h[0], h[1]] += self.alpha * (reward + self.gamma * self.q_table[h[2]].max() - self.q_table[h[0], h[1]])
 
             # remove the entry, the action has received the feedback
             del self.taken_actions[id_event]
@@ -136,7 +139,15 @@ class QLearningRouting2(BASE_routing):
         #print(self.drone.identifier)
 
         # Store your current action --- you can add some stuff if needed to take a reward later
-        self.taken_actions[packet.event_ref.identifier] = (state, action)
+        next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.size_cell,
+                                                               width_area=self.simulator.env_width,
+                                                               x_pos=self.drone.next_target()[0],
+                                                               y_pos=self.drone.next_target()[1])[0])
+        
+        if not packet.event_ref.identifier in self.taken_actions:
+            self.taken_actions[packet.event_ref.identifier] = []
+        
+        self.taken_actions[packet.event_ref.identifier].append((state, action, next_state))
 
         #print(self.simulator.env_width)
 

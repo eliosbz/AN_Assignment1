@@ -2,6 +2,7 @@
 from src.routing_algorithms.georouting import GeoRouting
 from src.routing_algorithms.q_learning_routing import QLearningRouting
 from src.routing_algorithms.q_learning_routing2 import QLearningRouting2
+from src.routing_algorithms.q_learning_routing3 import QLearningRouting3
 from src.routing_algorithms.q_learning_routing_alpha import QLearningRouting_Alpha
 from src.routing_algorithms.q_learning_routing_depsilon import QLearningRouting_DEpsilon
 from src.routing_algorithms.random_routing import RandomRouting
@@ -43,7 +44,7 @@ DEBUG = False                         # bool: whether to print debug strings or 
 EXPERIMENTS_DIR = "data/evaluation_tests/"  # output data : the results of the simulation
 
 # drawaing
-PLOT_SIM = True      # bool: whether to plot or not the simulation.
+PLOT_SIM = False      # bool: whether to plot or not the simulation.
 WAIT_SIM_STEP = 0 #.1     # float: seconds, pauses the rendering for 'DELAY_PLOT' seconds.
 SKIP_SIM_STEP = 5      # int: steps, plot the simulation every 'RENDERING_STEP' steps. At least 1.
 DRAW_SIZE = 700       # int: size of the drawing window.
@@ -60,7 +61,7 @@ SIM_DURATION = 15000   # int: steps of simulation. # ***
 TS_DURATION = 0.150   # float: seconds duration of a step in seconds.
 SEED = 20         # int: seed of this simulation.
 
-N_DRONES = 30      # int: number of drones. # ***
+N_DRONES = 5      # int: number of drones. # ***
 ENV_WIDTH = 1500      # float: meters, width of environment.
 ENV_HEIGHT = 1500     # float: meters, height of environment.
 
@@ -89,6 +90,7 @@ class RoutingAlgorithm(Enum):
     RND = RandomRouting
     QL = QLearningRouting
     QL2 = QLearningRouting2
+    QL3 = QLearningRouting3
     QL_ALPHA03 = QLearningRouting_Alpha
     QL_DE = QLearningRouting_DEpsilon
 
@@ -106,7 +108,7 @@ class ChannelError(Enum):
         return list(map(lambda c: c.name, ChannelError))
 
 
-ROUTING_ALGORITHM = RoutingAlgorithm.QL_DE
+ROUTING_ALGORITHM = RoutingAlgorithm.QL3
 CHANNEL_ERROR_TYPE = ChannelError.GAUSSIAN
 
 COMMUNICATION_P_SUCCESS = 1   # float: probability to have success in a communication.
