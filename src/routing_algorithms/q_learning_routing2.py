@@ -62,7 +62,7 @@ class QLearningRouting2(BASE_routing):
             #compute reward - DA MIGLIORARE
             reward = self.compute_reward(outcome, delay, drone)
             #reward = outcome
-            print(self.q_table)
+            #print(self.q_table)
             next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.size_cell,
                                                                width_area=self.simulator.env_width,
                                                                x_pos=self.drone.next_target()[0],

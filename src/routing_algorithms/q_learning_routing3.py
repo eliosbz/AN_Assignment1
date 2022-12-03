@@ -69,7 +69,7 @@ class QLearningRouting3(BASE_routing):
             #                                                   x_pos=self.drone.next_target()[0],
             #                                                   y_pos=self.drone.next_target()[1])[0])
 
-            print(self.q_table)
+            #print(self.q_table)
             for h in history:
                 self.q_table[h[0], h[1]] += self.alpha * (reward + self.gamma * self.q_table[h[2]].max() - self.q_table[h[0], h[1]])
 
