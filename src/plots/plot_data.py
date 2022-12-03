@@ -66,7 +66,7 @@ def plot(algorithms: list,
                     color=PLOT_DICT[algorithm]["color"],
                     markersize=8)
 
-    ax1.set_ylabel(ylabel=str(type), fontsize=LABEL_SIZE)
+    ax1.set_ylabel(ylabel=str(type).replace("_", " "), fontsize=LABEL_SIZE)
     ax1.set_xlabel(xlabel="UAVs", fontsize=LABEL_SIZE)
     ax1.tick_params(axis='both', which='major', labelsize=ALL_SIZE)
 

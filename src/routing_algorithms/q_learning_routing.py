@@ -26,15 +26,10 @@ class QLearningRouting(BASE_routing):
             self.q_table[i] = [0 for i in range(self.NUMBER_OF_ACTIONS)]
         self.random_gen = np.random.RandomState(self.simulator.seed)
 
-    # def compute_quality():
-    #    1/cur_step
-
     def TD(self, reward, max_action, Q_old):
         return reward + self.GAMMA * max_action - Q_old
 
     def compute_reward(self, delay, outcome, drone):
-        # self.selection_count += 1 # to compute the UBC we need to keep the count of the times this action is selected and thus a reward is received
-
         # This is a more complex reward that reflects the goodness of the feedback
         if outcome == 1:
             # a packet is received with some delay
@@ -44,7 +39,6 @@ class QLearningRouting(BASE_routing):
         elif outcome == -1:
             reward = -2
 
-        # self.total_rewards += reward # to compute the UBC we need to sum the reward
         return reward
 
     def feedback(self, drone, id_event, delay, outcome):
