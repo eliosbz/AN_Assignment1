@@ -221,9 +221,9 @@ class QLearningRouting_DEpsilon(BASE_routing):
                         if (
                             delta >= 0  # there is an intersection
                             and dy <= 0  # the drone is going down
-                            # and (
-                            #     (x1 <= 0 and dx >= 0) or (x1 >= 0 and dx <= 0)
-                            # )  # the drone is going
+                            and (
+                                 (x1 <= 0 and dx >= 0) or (x1 >= 0 and dx <= 0)
+                            )  # the drone is going trough the depot
                         ):
                             # rx1 = D * dy + (1 if dy >= 0 else -1) * dx * np.sqrt(delta) / dr2
                             # rx2 = D * dy - (1 if dy >= 0 else -1) * dx * np.sqrt(delta) / dr2
