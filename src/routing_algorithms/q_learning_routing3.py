@@ -1,6 +1,5 @@
 import numpy as np
 
-from numpy.random import Generator, PCG64
 from src.routing_algorithms.BASE_routing import BASE_routing
 from src.utilities import utilities as util
 from typing import List, Dict
@@ -9,7 +8,7 @@ class QLearningRouting3(BASE_routing):
 
     def __init__(self, drone, simulator):
         BASE_routing.__init__(self, drone=drone, simulator=simulator)
-        self.size_cell = 75
+        self.size_cell = 100
         self.cells_number = int(self.simulator.env_width / self.size_cell) ** 2
         self.max_epsilon = 1.0
         self.min_epsilon = 0.005
@@ -21,11 +20,9 @@ class QLearningRouting3(BASE_routing):
         self.taken_actions: Dict[int : List[(int, int, int)]] = {}  # id event : (old_state, old_action)
         self.random_gen = np.random.RandomState(self.simulator.seed)
 
-    def compute_reward(self, outcome, delay, drone):
-        if outcome == 1:
-            return 2 * drone.buffer_length() / delay
-        else:
-            return -2
+    def compute_reward(self, outcome, delay):
+        if outcome == 1: return 2 / delay
+        else: return -2
         
     def feedback(self, drone, id_event, delay, outcome):
         """
@@ -50,26 +47,20 @@ class QLearningRouting3(BASE_routing):
             # TIPS: implement here the q-table updating process
 
             # Drone id and Taken actions
-            #print(f"\nIdentifier: {self.drone.identifier}, Taken Actions: {self.taken_actions}, Time Step: {self.simulator.cur_step}")
+            # print(f"\nIdentifier: {self.drone.identifier}, Taken Actions: {self.taken_actions}, Time Step: {self.simulator.cur_step}")
 
             # feedback from the environment
-            #print(drone, id_event, delay, outcome)
+            # print(drone, id_event, delay, outcome)
 
             # TODO: write your code here
 
-            #history = set(self.taken_actions[id_event])
+            # take the total history of a that specific packet
             history = self.taken_actions[id_event]
-            #print(history)
 
-            #compute reward - DA MIGLIORARE
-            reward = self.compute_reward(outcome, delay, drone)
-            #reward = outcome
-            #next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.size_cell,
-            #                                                   width_area=self.simulator.env_width,
-            #                                                   x_pos=self.drone.next_target()[0],
-            #                                                   y_pos=self.drone.next_target()[1])[0])
+            # compute reward
+            reward = self.compute_reward(outcome, delay)
 
-            #print(self.q_table)
+            # update q-table for every state that the packet traversed
             for h in history:
                 self.q_table[h[0], h[1]] += self.alpha * (reward + self.gamma * self.q_table[h[2]].max() - self.q_table[h[0], h[1]])
 
@@ -94,28 +85,23 @@ class QLearningRouting3(BASE_routing):
                                                         width_area=self.simulator.env_width,
                                                         x_pos=self.drone.coords[0],  # e.g. 1500
                                                         y_pos=self.drone.coords[1])[0]  # e.g. 500
-                                                
         
-        #print(cell_index)
-        
-        state, action = None, None
+        state, action = int(cell_index), None
         relay = None
 
-        state = int(cell_index)
-        neighbors_drones = {neighbor for hello_pkt, neighbor in opt_neighbors}
-        epsilon = self.min_epsilon + (self.max_epsilon - self.min_epsilon)*np.exp(-self.epsilon_decay*self.simulator.cur_step)
+        neighbors_drones = {v[1] for v in opt_neighbors}
+        epsilon = self.min_epsilon + (self.max_epsilon - self.min_epsilon) * np.exp(-self.epsilon_decay * self.simulator.cur_step)
 
         if self.random_gen.uniform(0, 1) < epsilon:
-            #explore
+            # explore
+            # take random choice
             action = 0 if self.random_gen.uniform(0, 1) < 0.5 else 1
 
             if action == 0: relay = self.drone
             else: relay = self.simulator.rnd_routing.choice(list(neighbors_drones))
-            #print(str(random) + " explore" + (" keep" if action == 0 else " send"))
         else:
-            #exploit
-            #print(str(self.q_table[state]) + str(np.argmax(self.q_table[state])))
-            #action = np.argmax(self.q_table[state])
+            # exploit
+            # if the q-table has the same value for all the actions it takes a random choice, otherwise it exploits
             if self.q_table[state][0] == self.q_table[state][1]:
                 action = 0 if self.random_gen.uniform(0, 1) < 0.5 else 1
             else:
@@ -123,6 +109,7 @@ class QLearningRouting3(BASE_routing):
 
             if action == 0: relay = self.drone
             else:
+                # if the chosen action is to send the packet to a drone, it choses the one whose the next target is closer to the depot
                 closest_drone = (self.drone, util.euclidean_distance(self.drone.next_target(), self.drone.depot.coords))
 
                 for drone in neighbors_drones:
@@ -132,11 +119,6 @@ class QLearningRouting3(BASE_routing):
                         closest_drone = (drone, distance)
 
                 relay = closest_drone[0]
-            
-            #print(str(random) + " exploit" + (" keep" if action == 0 else " send"))
-        
-        
-        #print(self.drone.identifier)
 
         # Store your current action --- you can add some stuff if needed to take a reward later
         next_state = int(util.TraversedCells.coord_to_cell(size_cell=self.size_cell,
@@ -147,8 +129,7 @@ class QLearningRouting3(BASE_routing):
         if not packet.event_ref.identifier in self.taken_actions:
             self.taken_actions[packet.event_ref.identifier] = []
         
+        # store the triple (state, action, next_state) in a list so it can be used later
         self.taken_actions[packet.event_ref.identifier].append((state, action, next_state))
-
-        #print(self.simulator.env_width)
 
         return relay  # here you should return a drone object!

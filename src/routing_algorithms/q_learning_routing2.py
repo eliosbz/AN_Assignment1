@@ -86,7 +86,6 @@ class QLearningRouting2(BASE_routing):
                                                         width_area=self.simulator.env_width,
                                                         x_pos=self.drone.coords[0],  # e.g. 1500
                                                         y_pos=self.drone.coords[1])[0]  # e.g. 500
-        # print(cell_index)
         
         state, action = int(cell_index), None
         relay = None
@@ -121,8 +120,6 @@ class QLearningRouting2(BASE_routing):
                         closest_drone = (drone, distance)
 
                 relay = closest_drone[0]
-        
-        # print(self.drone.identifier)
 
         # Store your current action --- you can add some stuff if needed to take a reward later
         self.taken_actions[packet.event_ref.identifier] = (state, action)
