@@ -1,3 +1,14 @@
+# Autonomous Networking assignment 1
+This repository contains various solutions for the first assignment of _Autonomous Networking_ course at Sapienza University of Rome, a.y. 2022/2023.
+
+## About
+The assignment consists in designing and developing a Q-Learning algorithm with the aim of maximizing the amount of packets that a group of drones has to deliver to a depot.
+All the solutions rely on [DroNET](https://github.com/flaat/DroNETworkSimulator), a software that simulates a complex on-demand drones environment.
+
+## Authors
+- Antonio Andrea Gargiulo
+- Elios Buzo
+
 # DroNET - Autonomous Networking 2022-2023
 
 ## What is DroNET?
